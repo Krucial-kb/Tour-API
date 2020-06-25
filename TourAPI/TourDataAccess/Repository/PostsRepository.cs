@@ -9,32 +9,32 @@ namespace Tour.DataAccess.Repository
 {
     public class PostsRepository : IPostsRepository
     {
-        public Task<Posts> CreatePostAsync(Posts post)
+        public async Task<Posts> CreatePostAsync(Posts post)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeletePostAsync(int postID)
+        public async Task DeletePostAsync(int postID)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<Posts>> GetPostsAsync(Posts post)
+        public async Task<IEnumerable<Posts>> GetPostsAsync(Posts post)
         {
             throw new NotImplementedException();
         }
 
-        public Task<Posts> GetPostsByIdAsync(int postID)
+        public async Task<Posts> GetPostsByIdAsync(int postID)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> PostExistsAsync(int postID)
+        public async Task<bool> PostExistsAsync(int postID)
         {
             throw new NotImplementedException();
         }
 
-        public Task UpdatePostAsync(Posts post)
+        public async Task UpdatePostAsync(Posts post)
         {
             throw new NotImplementedException();
         }
