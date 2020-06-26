@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Tour.Domain.DomainModels;
@@ -55,5 +56,7 @@ namespace Tour.Domain.Interfaces
         /// <param name="userID"></param>
         /// <returns></returns>
         Task DeleteUserAsync(int userID);
+         EntityState Changed(Users user);
+        Task SaveChangesAsync();
     }
 }

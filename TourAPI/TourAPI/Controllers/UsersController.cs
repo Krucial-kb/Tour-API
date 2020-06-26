@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Tour.Domain.Interfaces;
 using TourAPI.Models;
 
 namespace TourAPI.Controllers
@@ -14,56 +15,98 @@ namespace TourAPI.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly TourContext _context;
+        private readonly IUsersRepository _repo;
         private readonly ILogger<UsersController> _logger;
 
-        public UsersController(TourContext context, ILogger<UsersController> Logger)
+        public UsersController(IUsersRepository Repo ,ILogger<UsersController> Logger)
         {
-            _context = context;
+            _repo = Repo;
             _logger = Logger;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
+        [ProducesResponseType(typeof(IEnumerable<ApiModels.ApiUsers>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<Users>>> GetUsersAsync()
         {
-            return await _context.Users.ToListAsync();
+            IEnumerable<Tour.Domain.DomainModels.Users> users = await _repo.GetUsersAsync();
+
+            IEnumerable<ApiModels.ApiUsers> result = users.Select(u => new ApiModels.ApiUsers
+            { 
+                UserId = u.UserId,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                UserName = u.UserName,
+                Email = u.Email,
+                Password = u.Password,
+                Posts = u.Posts,
+                ProfilePic = u.ProfilePic
+            });
+
+            return Ok(result);
         }
 
         // GET: api/Users/5
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiModels.ApiUsers), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Users>> GetUsers(int id)
         {
-            var users = await _context.Users.FindAsync(id);
+            Tour.Domain.DomainModels.Users users = await _repo.GetUserByIdAsync(id);
+
+            var result = new ApiModels.ApiUsers
+            {
+                UserId = users.UserId,
+                FirstName = users.FirstName,
+                LastName = users.LastName,
+                UserName = users.UserName,
+                Email = users.Email,
+                Password = users.Password,
+                Posts = users.Posts,
+                ProfilePic = users.ProfilePic
+            };
 
             if (users == null)
             {
                 return NotFound();
             }
 
-            return users;
+            return Ok(result);
         }
 
         // PUT: api/Users/5
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutUsers(int id, Users users)
+        public async Task<IActionResult> PutUsers(int id, Tour.Domain.DomainModels.Users users)
         {
             if (id != users.UserId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(users).State = EntityState.Modified;
+            var result = new Tour.Domain.DomainModels.Users
+            {
+                UserId = users.UserId,
+                FirstName = users.FirstName,
+                LastName = users.LastName,
+                UserName = users.UserName,
+                Email = users.Email,
+                Password = users.Password,
+                Posts = users.Posts,
+                ProfilePic = users.ProfilePic
+            };
+
+            _repo.Changed(result);
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _repo.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UsersExists(id))
+                if (! (await UsersExists(id)))
                 {
                     return NotFound();
                 }
@@ -80,33 +123,36 @@ namespace TourAPI.Controllers
         // To protect from overposting attacks, enable the specific properties you want to bind to, for
         // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
         [HttpPost]
-        public async Task<ActionResult<Users>> PostUsers(Users users)
+        public async Task<ActionResult> PostUsers(Tour.Domain.DomainModels.Users users)
         {
-            _context.Users.Add(users);
-            await _context.SaveChangesAsync();
+            Tour.Domain.DomainModels.Users create = await _repo.CreateUserAsync(users);
 
-            return CreatedAtAction("GetUsers", new { id = users.UserId }, users);
+            var result = new ApiModels.ApiUsers
+            {
+                UserId = users.UserId,
+                FirstName = users.FirstName,
+                LastName = users.LastName,
+                UserName = users.UserName,
+                Email = users.Email,
+                Password = users.Password,
+                Posts = users.Posts,
+                ProfilePic = users.ProfilePic
+            };
+
+            return Ok(result);
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Users>> DeleteUsers(int id)
+        public ActionResult DeleteUsers(int id)
         {
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
-            {
-                return NotFound();
-            }
-
-            _context.Users.Remove(users);
-            await _context.SaveChangesAsync();
-
-            return users;
+            var result = _repo.DeleteUserAsync(id);
+            return Ok(result);
         }
-
-        private bool UsersExists(int id)
+        [HttpGet("{id}")]
+        private Task<bool> UsersExists(int id)
         {
-            return _context.Users.Any(e => e.UserId == id);
+            return _repo.UserExistsAsync(id);
         }
     }
 }

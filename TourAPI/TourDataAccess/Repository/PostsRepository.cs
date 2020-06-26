@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,32 +10,42 @@ namespace Tour.DataAccess.Repository
 {
     public class PostsRepository : IPostsRepository
     {
-        public async Task<Posts> CreatePostAsync(Posts post)
+        public EntityState Changed(Users user)
         {
             throw new NotImplementedException();
         }
 
-        public async Task DeletePostAsync(int postID)
+        public Task<Posts> CreatePostAsync(Posts post)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<Posts>> GetPostsAsync(Posts post)
+        public Task DeletePostAsync(int postID)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<Posts> GetPostsByIdAsync(int postID)
+        public Task<IEnumerable<Posts>> GetPostsAsync(Posts post)
         {
             throw new NotImplementedException();
         }
 
-        public async Task<bool> PostExistsAsync(int postID)
+        public Task<Posts> GetPostsByIdAsync(int postID)
         {
             throw new NotImplementedException();
         }
 
-        public async Task UpdatePostAsync(Posts post)
+        public Task<bool> PostExistsAsync(int postID)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task SaveChangesAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task UpdatePostAsync(Posts post)
         {
             throw new NotImplementedException();
         }
@@ -74,5 +85,6 @@ namespace Tour.DataAccess.Repository
             // GC.SuppressFinalize(this);
         }
         #endregion
+
     }
 }

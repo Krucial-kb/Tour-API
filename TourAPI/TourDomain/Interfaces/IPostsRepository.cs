@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,9 @@ namespace Tour.Domain.Interfaces
         Task<Posts> GetPostsByIdAsync(int postID);
         Task<Posts> CreatePostAsync(Posts post);
         Task<bool> PostExistsAsync(int postID);
+        EntityState Changed(Users user);
         Task UpdatePostAsync(Posts post);
         Task DeletePostAsync(int postID);
+        Task SaveChangesAsync();
     }
 }

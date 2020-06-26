@@ -12,6 +12,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Tour.DataAccess.Repository;
+using Tour.Domain.Interfaces;
 using TourAPI.Models;
 
 namespace TourAPI
@@ -28,6 +30,8 @@ namespace TourAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IUsersRepository, UsersRepository>();
+            services.AddScoped<IPostsRepository, PostsRepository>();
             services.AddControllers();
 
             services.AddSwaggerGen(c =>
@@ -51,7 +55,7 @@ namespace TourAPI
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "TourAPI V1");
             });
 
             app.UseHttpsRedirection();

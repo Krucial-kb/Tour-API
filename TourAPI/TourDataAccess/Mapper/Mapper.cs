@@ -7,6 +7,21 @@ namespace Tour.DataAccess.Mapper
     public class Mapper
     {
 
+        public static object MapUser(Domain.DomainModels.Users user)
+        {
+            return new Domain.DomainModels.Users
+            {
+                UserId = user.UserId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Email = user.Email,
+                Password = user.Password,
+                Posts = user.Posts,
+                ProfilePic = user.ProfilePic
+            };
+        }
+
         //-------------------------------------------------------------------------
         //-------------------------------------------------------------------------
         //-----------------------Map Domain to DbModels----------------------------

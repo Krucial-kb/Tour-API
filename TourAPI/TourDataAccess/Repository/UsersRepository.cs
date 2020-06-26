@@ -1,45 +1,90 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Tour.Domain.DomainModels;
 using Tour.Domain.Interfaces;
+
 
 namespace Tour.DataAccess.Repository
 {
     public class UsersRepository : IUsersRepository
     {
-        public async Task<Domain.DomainModels.Users> CreateUserAsync(Domain.DomainModels.Users user)
+        private readonly TourAPI.Models.TourContext _ctx;
+
+        public UsersRepository(TourAPI.Models.TourContext context)
+        {
+            _ctx = context;
+        }
+        
+        public EntityState Changed(Users user)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<Users> CreateUserAsync(Domain.DomainModels.Users user)
+        {
+            var newUser = new TourAPI.Models.Users
+            {
+                UserId = user.UserId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                Email = user.Email,
+                Password = user.Password,
+                ProfilePic = user.ProfilePic,
+                Posts = user.Posts
+            };
+
+            _ctx.Users.Add(newUser);
+            await _ctx.SaveChangesAsync();
+            return Mapper.Mapper.MapUsers(newUser);
         }
 
         public async Task DeleteUserAsync(int userID)
         {
-            throw new NotImplementedException();
+            _ctx.Remove(userID);
+            await _ctx.SaveChangesAsync();
+
+
         }
 
-        public async Task<Domain.DomainModels.Users> GetPatientByUsernameAsync(string userName)
+        public async Task<Users> GetPatientByUsernameAsync(string userName)
         {
-            throw new NotImplementedException();
+            TourAPI.Models.Users user = await _ctx.Users.FirstAsync(u => u.UserName == userName);
+
+            return Mapper.Mapper.MapUsers(user);
         }
 
-        public async Task<Domain.DomainModels.Users> GetUserByIdAsync(int userID)
+        public async Task<Users> GetUserByIdAsync(int userID)
         {
-            throw new NotImplementedException();
+            TourAPI.Models.Users user = await _ctx.Users.FirstAsync(u => u.UserId == userID);
+
+            return Mapper.Mapper.MapUsers(user);
         }
 
-        public async Task<IEnumerable<Domain.DomainModels.Users>> GetUsersAsync(string search = null)
+        public async Task<IEnumerable<Users>> GetUsersAsync(string search = null)
         {
-            throw new NotImplementedException();
+            List<TourAPI.Models.Users> user = await _ctx.Users.ToListAsync();
+
+            return user.Select(Mapper.Mapper.MapUsers);
         }
 
-        public async Task UpdateUserAsync(Domain.DomainModels.Users user)
+        public async Task SaveChangesAsync()
+        {
+            await _ctx.SaveChangesAsync();
+        }
+
+        public Task UpdateUserAsync(Users user)
         {
             throw new NotImplementedException();
         }
 
         public async Task<bool> UserExistsAsync(int userid)
         {
-            throw new NotImplementedException();
+            return await _ctx.Users.AnyAsync(u => u.UserId == userid);
         }
 
         #region IDisposable Support
@@ -77,6 +122,5 @@ namespace Tour.DataAccess.Repository
             // GC.SuppressFinalize(this);
         }
         #endregion
-
     }
 }
